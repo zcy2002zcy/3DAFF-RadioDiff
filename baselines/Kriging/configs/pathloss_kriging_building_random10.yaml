@@ -1,0 +1,21 @@
+task_name: "pathloss_kriging_building_random10"
+seed: 42
+
+data:
+  test_dir: "D:/datas/processed_pl_aff_dataset/test"
+  building_dir: "D:/zdata/Building_Infomation/buildings"
+  image_size: 256
+  max_building_height: 20.0
+  sampling_mode: "random"
+  sample_rate: 0.10
+
+model:
+  variogram_model: "linear"
+  n_closest_points: 32
+  query_chunk_size: 4096
+
+eval:
+  save_first_n: 20
+  clip_output: true
+  enforce_measurement_consistency: true
+  output_dir: "outputs/pathloss_kriging_building_random10"

@@ -1,0 +1,55 @@
+task_name: "pathloss_pix2pix_buildingmask_random10_matched"
+seed: 42
+
+data:
+  train_dir: "D:/datas/processed_pl_aff_dataset/train"
+  val_dir: "D:/datas/processed_pl_aff_dataset/val"
+  test_dir: "D:/datas/processed_pl_aff_dataset/test"
+  building_dir: "D:/zdata/Building_Infomation/buildings"
+  image_size: 256
+  max_building_height: 20.0
+  min_receiver_altitude: 1.0
+  max_receiver_altitude: 4.0
+  use_sampling: true
+  sampling_mode: "random"
+  sample_rate: 0.10
+  deterministic_sampling_for_eval: true
+  random_train_samples: 0
+  random_val_samples: 0
+  verify_files: false
+  num_workers: 4
+  prefetch_factor: 4
+  pin_memory: true
+  persistent_workers: true
+
+model:
+  in_channels: 4
+  out_channels: 1
+  base_channels: 15
+  lambda_l1: 100.0
+
+train:
+  epochs: 10
+  batch_size: 2
+  lr: 0.0001
+  beta1: 0.5
+  beta2: 0.999
+  amp: false
+  device: "cuda"
+  grad_clip: 1.0
+
+eval:
+  batch_size: 1
+  save_first_n: 20
+  enforce_measurement_consistency: true
+  clip_output: true
+  save_dir: "outputs/pathloss_pix2pix_buildingmask_random10_matched/eval_results"
+
+checkpoint:
+  save_dir: "outputs/pathloss_pix2pix_buildingmask_random10_matched/checkpoints"
+
+logging:
+  log_dir: "outputs/pathloss_pix2pix_buildingmask_random10_matched/logs"
+  iter_log_every: 200
+  max_train_steps_per_epoch: 0
+  max_val_steps_per_epoch: 0

@@ -1,0 +1,33 @@
+{
+  "status": "PASS",
+  "method_label": "PEFNet-inspired building-input adaptation",
+  "authorized_model_inputs": [
+    "q",
+    "raw building polygons/heights",
+    "10% sparse path loss",
+    "sampling mask",
+    "receiver altitude z"
+  ],
+  "ignored_npz_fields": [
+    "los",
+    "depth"
+  ],
+  "source_npz_keys": [
+    "q",
+    "los",
+    "depth",
+    "psi",
+    "z",
+    "id"
+  ],
+  "sample_count": 6554,
+  "sample_fraction": 0.100006103515625,
+  "output_shape": [
+    1,
+    1,
+    256,
+    256
+  ],
+  "parameter_count": 3912324,
+  "target_use": "training loss, sampled values, and metrics only"
+}

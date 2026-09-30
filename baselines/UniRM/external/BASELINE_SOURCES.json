@@ -1,0 +1,58 @@
+{
+  "RadioUNet": {
+    "url": "https://github.com/RonLevie/RadioUNet",
+    "commit": "36ab70663443af615c37051ce97da14d04925c7a",
+    "license": "MIT",
+    "local_use": "architecture reference; project implementation is labelled RadioUNet-style (adapted)"
+  },
+  "RadioDiff": {
+    "url": "https://github.com/UNIC-Lab/RadioDiff",
+    "commit": "ee7c4c380037dd6aa30ab675d099b6f62199d3d5",
+    "license": "custom permissive LICENSE in upstream checkout",
+    "status": "source available; UrbanRadio3D-trained checkpoint not provided"
+  },
+  "RadioDiff-Inverse": {
+    "url": "https://github.com/UNIC-Lab/radiodiff-inverse",
+    "commit": "e24c602c2e58946cbada059fb0aa2dd679922039",
+    "license": "no license file found at pinned commit",
+    "status": "not redistributed or modified; no UrbanRadio3D-trained score checkpoint provided"
+  },
+  "RadioDiff-3D": {
+    "url": "https://github.com/UNIC-Lab/UrbanRadio3D",
+    "paper": "X. Wang et al., RadioDiff-3D: A 3D x 3D Radio Map Dataset and Generative Diffusion Based Benchmark for 6G Environment-Aware Communication, IEEE Transactions on Network Science and Engineering",
+    "doi": "10.1109/TNSE.2025.3590545",
+    "official_training_code": null,
+    "upstream_commit": null,
+    "license": "not applicable; no author model code or weights are copied",
+    "local_use": "independent upstream-and-paper-informed four-height conditional diffusion adaptation; trained from scratch with one fixed-seed DDIM volume per canonical anchor and only the anchor slice scored",
+    "method_label": "RadioDiff-3D-style conditional diffusion (adapted)",
+    "status": "official project page/data source verified; no directly runnable official 3D training package verified; local result must not be called an official reproduction"
+  },
+  "RMTransformer": {
+    "paper": "Y. Li, C. Zhang, W. Wang, and Y. Huang, RMTransformer: Accurate Radio Map Construction and Coverage Prediction, IEEE VTC2025-Spring, 2025",
+    "doi": "10.1109/VTC2025-SPRING65109.2025.11174709",
+    "arxiv": "https://arxiv.org/abs/2501.05190",
+    "official_code": null,
+    "upstream_commit": null,
+    "license": "not applicable; no author code or weights are copied",
+    "local_use": "independent paper-guided multi-scale Transformer/convolution adaptation with three common input channels and no external pretraining",
+    "method_label": "RMTransformer-style (height-adapted)",
+    "status": "no author-maintained training repository verified; local result must not be called an official reproduction"
+  },
+  "UniRM": {
+    "url": "https://github.com/Shirleyue/UniRM",
+    "commit": "23d03510b7ae7ef1eeae4195269e2ebf86de0341",
+    "license": "no license file found at pinned commit",
+    "local_use": "official size-1 Prompt-UNet called through a no-sampling adapter; no external pretraining or sparse ground-truth RSS is used"
+  },
+  "PEFNet": {
+    "paper": "F. Jiang, T. Li, X. Lv, H. Rui, and D. Jin, Physics-Informed Neural Networks for Path Loss Estimation by Solving Electromagnetic Integral Equations, IEEE Transactions on Wireless Communications, vol. 23, no. 10, pp. 15380-15393, 2024",
+    "doi": "10.1109/TWC.2024.3429196",
+    "reference_pdf_sha256": "0DCE0DC9F353DA6657FE6C90F5B126B6A0A1D75422709DF96A5B22AE5598956D",
+    "official_code": null,
+    "upstream_commit": null,
+    "license": "not applicable; no author code or weights are copied",
+    "local_use": "independent paper-inspired VIE-regularized U-Net adaptation; stable-v2 uses GroupNorm, BF16 only for the knowledge U-Net, FP32 refinement, and a fixed warm-up schedule; must be reported as PEFNet-inspired, not official or faithful PEFNet reproduction",
+    "status": "carrier frequency, metric grid scale, conductivity, complex fields, transmit power, and PNG-to-dB mapping are unavailable in the local dataset; dimensionless effective-medium and numerical-stability assumptions are recorded in configs/pefnet_inspired_adapted.yaml and docs/PEFNET_ADAPTATION.md"
+  }
+}

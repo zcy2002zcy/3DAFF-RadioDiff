@@ -6,8 +6,10 @@ for comparison: random sampling and uniform sampling. Both use adaptive LoS-dept
 fusion (AFF) and a 200-step DDPM trained and evaluated with a near-Gaussian
 terminal state.
 
-The repository intentionally excludes datasets, checkpoints, logs, and generated
-outputs so that it can be published directly on GitHub.
+The repository intentionally excludes datasets, checkpoints, and generated
+outputs from the main 3DAFF runs. The `baselines/` bundle keeps selected
+checkpoint-free logs and evaluation evidence so the reported comparisons can be
+audited without distributing model weights.
 
 ## Protocol
 
@@ -40,7 +42,16 @@ models/        AFF, residual U-Net, Transformer, and embeddings
 scripts/       experiment check, training, and full-noise evaluation
 trainers/      shared training/evaluation helpers
 utils/         metrics, logging, I/O, seeds, and visualization
+baselines/     baseline implementations plus checkpoint-free run evidence
+RESULTS.md     reported comparison table and available-run provenance
 ```
+
+## Results
+
+Under the 10% random-measurement protocol, the reported headline result for
+3DAFF-RadioDiff is **0.0179 NMSE**, **0.0686 RMSE**, and **29.5560 dB PSNR**.
+The complete baseline table, protocol notes, and links to the run evidence
+included in this repository are in [RESULTS.md](RESULTS.md).
 
 ## Data
 

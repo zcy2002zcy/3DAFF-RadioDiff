@@ -1,0 +1,21 @@
+{
+  "status": "BLOCKED_FROM_COMMON_TABLE",
+  "config": "C:\\Users\\Administrator\\Desktop\\3DAFF-RadioDiff_Baselines\\PEFNet\\configs\\pefnet_inspired_adapted.yaml",
+  "method_label": "PEFNet-inspired VIE-regularized U-Net (adapted)",
+  "implementation_status": "paper-inspired adaptation; not an official or faithful PEFNet reproduction",
+  "sample_rate": 0.0,
+  "input_channels": [
+    "tx_source",
+    "building_occupancy_at_rx_height",
+    "incident_field_real",
+    "incident_field_imag",
+    "rx_height_plane"
+  ],
+  "output": "two-channel field plus one-channel residual path-loss estimate",
+  "reasons": [
+    "Configured sample_rate is 0.0, not the common random 10% protocol.",
+    "The adaptation uses a separate manifest/dataset and evaluation support.",
+    "It is paper-inspired, not an official or faithful PEFNet reproduction.",
+    "No value from this configuration may substantiate the common comparison table without alignment and retraining."
+  ]
+}

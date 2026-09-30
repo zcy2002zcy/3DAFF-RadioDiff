@@ -22,6 +22,15 @@ tensorboard/
 metrics_per_sample.csv
 metrics_summary.csv
 
+# Keep the lightweight, checkpoint-free baseline evidence bundled for audit.
+# The generic experiment rules above still apply to the main 3DAFF runs.
+!baselines/**/outputs*/
+!baselines/**/outputs*/**
+!baselines/logs/
+!baselines/logs/**
+!baselines/**/logs/
+!baselines/**/logs/**
+
 # Local data and caches
 data/
 datasets_cache/
@@ -31,3 +40,6 @@ cache/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Prediction archives are retained only inside the audited baseline evidence.
+!baselines/**/outputs*/**/*.npz

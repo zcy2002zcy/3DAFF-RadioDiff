@@ -1,0 +1,23 @@
+﻿**********************
+Windows PowerShell 脚本开始
+开始时间: 20260925183037
+用户名: WIN-NONCE8LQUGL\Administrator
+RunAs 用户: WIN-NONCE8LQUGL\Administrator
+配置名称: 
+计算机: WIN-NONCE8LQUGL (Microsoft Windows NT 10.0.20348.0)
+主机应用程序: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass -File D:\zdata\3DAFF-RadioDiff_Baselines\run_gpu_queue.ps1 -Gpu 2 -MethodsCsv RadioDiff3D,UniRM,KrigingTopology -Action All -PythonExe D:\Anaconda3\envs\radiodiffzcy\python.exe -Root D:\zdata\3DAFF-RadioDiff_Baselines
+进程 ID: 3272
+PSVersion: 5.1.20348.2400
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.20348.2400
+BuildVersion: 10.0.20348.2400
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+GPU 2 queue: RadioDiff3D -> UniRM -> KrigingTopology
+Python: D:\Anaconda3\envs\radiodiffzcy\python.exe
+Log: D:\zdata\3DAFF-RadioDiff_Baselines\logs\gpu2_All_20260925_183037.log
+
+===== GPU 2 | RadioDiff3D | All =====

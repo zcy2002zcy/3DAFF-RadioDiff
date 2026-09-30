@@ -1,0 +1,76 @@
+{
+  "base_config": "base.yaml",
+  "experiment": {
+    "name": "pefnet_inspired_adapted_stable_v2_random0",
+    "method_label": "PEFNet-inspired VIE-regularized U-Net (adapted)",
+    "implementation_status": "paper-inspired adaptation; not an official or faithful PEFNet reproduction",
+    "sample_rate": 0.0
+  },
+  "reference": {
+    "title": "Physics-Informed Neural Networks for Path Loss Estimation by Solving Electromagnetic Integral Equations",
+    "doi": "10.1109/TWC.2024.3429196",
+    "pdf_sha256": "0DCE0DC9F353DA6657FE6C90F5B126B6A0A1D75422709DF96A5B22AE5598956D",
+    "official_code_available": false,
+    "external_pretraining": false
+  },
+  "data": {
+    "train_maps": 4096,
+    "val_maps": 128,
+    "test_maps": 128,
+    "data_seed": 42,
+    "selection_strategy": "balanced_scene"
+  },
+  "model": {
+    "input_channels": 5,
+    "input_channel_names": [
+      "tx_source",
+      "building_occupancy_at_rx_height",
+      "incident_field_real",
+      "incident_field_imag",
+      "rx_height_plane"
+    ],
+    "base_channels": 128,
+    "normalization": "group_norm",
+    "max_norm_groups": 32,
+    "force_refinement_fp32": true,
+    "field_output_channels": 2,
+    "residual_input_channels": 1,
+    "residual_output_channels": 1
+  },
+  "physics": {
+    "formulation": "dimensionless_2d_tm_vie_effective_medium",
+    "epsilon_air": 1.0,
+    "epsilon_building": 4.0,
+    "conductivity_s_per_m": 0.0,
+    "dimensionless_wavenumber": 0.35,
+    "physics_grid_size": 64,
+    "grid_spacing": 1.0,
+    "grid_spacing_units": "dimensionless_pixel",
+    "assumption_notice": "The dataset does not expose carrier frequency, metric pixel size, conductivity, complex fields, transmit power, or a verified PNG-to-dB mapping. These are explicitly dimensionless effective-medium assumptions, not a 5.9 GHz or material-calibrated electromagnetic solve."
+  },
+  "training": {
+    "epochs": 100,
+    "batch_size": 1,
+    "learning_rate": 0.0001,
+    "minimum_learning_rate": 0.000001,
+    "warmup_epochs": 5,
+    "warmup_start_factor": 0.1,
+    "precision": "bf16",
+    "autocast_scope": "knowledge_unet_only",
+    "stability_revision": "groupnorm_bf16_refinement_fp32_warmup_v2",
+    "deterministic_algorithms": true,
+    "weight_decay": 0.000001,
+    "early_stopping_patience": 15,
+    "max_steps_per_epoch": 1000,
+    "lambda_data": 1.0,
+    "max_grad_norm": 1.0,
+    "num_workers": 0,
+    "selection_metric": "nmse"
+  },
+  "evaluation": {
+    "support": "valid_rx_only",
+    "primary_metric_domain": "normalized_minus1_to_1",
+    "normalization": "x / 127.5 - 1.0",
+    "per_map_macro_average": true
+  }
+}
