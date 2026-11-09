@@ -1,2 +1,0 @@
-"""Shared project utilities."""
-

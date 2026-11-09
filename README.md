@@ -1,143 +1,81 @@
-# 3DAFF-RadioDiff: Path-Loss Reconstruction
+# 3DAFF-RadioDiff
 
-Clean research implementation of 3DAFF-RadioDiff for path-loss radio-map
-reconstruction. This repository contains the two 10% measurement protocols used
-for comparison: random sampling and uniform sampling. Both use adaptive LoS-depth
-fusion (AFF) and a 200-step DDPM trained and evaluated with a near-Gaussian
-terminal state.
+Official code for **3DAFF-RadioDiff: Geometry-Guided Residual Diffusion for Measurement-Free 3D Path-Loss Prediction**.
 
-The repository intentionally excludes datasets, checkpoints, and generated
-outputs from the main 3DAFF runs. The `baselines/` bundle keeps selected
-checkpoint-free logs and evaluation evidence so the reported comparisons can be
-audited without distributing model weights.
+3DAFF-RadioDiff jointly predicts path-loss maps at receiver heights of 1, 2, 3, and 4 m from only the transmitter location and the building geometry. No received signal strength (RSS) measurement is used at inference.
 
-## Protocol
+This is release **v1**. It contains source code only: no dataset, no pretrained weights, and no experiment outputs.
 
-- Target: normalized path-loss slice `psi`, with range `[-1, 1]`.
-- Geometry: depth map and LoS mask fused by sample-wise AFF weights.
-- Other conditions: transmitter/base-station map `q`, receiver altitude `z`, and
-  a sparse measurement map `s`.
-- Sampling: either random 10% or uniform 10%.
-- Diffusion: 200 linear steps, `beta_start=0.0005`, `beta_end=0.10`.
-- Training objective: noise-prediction MSE with a random diffusion timestep.
-- Evaluation: reverse DDPM sampling from independent `N(0, I)` noise.
-- Measurement consistency: predictions at observed positions are replaced by the
-  corresponding authorized sparse measurements before metric computation.
-- Metrics: NMSE, RMSE, SSIM, and PSNR (`data_range=2`) are computed over every
-  pixel of the final `256 x 256` slice, including observed and building pixels.
+## Method overview
 
-The complete test target is not passed to the network. It is read to construct the
-authorized 10% observation map and to compute metrics. The unobserved 90% remains
-hidden from the model during evaluation. Because the observed values are enforced
-before full-slice metric computation, the reported scores measure the fidelity of
-the delivered measurement-consistent map; they are not unobserved-only errors.
+- **Voxel-wise adaptive LoS--depth fusion (AFF).** A lightweight 3D convolutional module estimates normalized fusion weights for the LoS mask and the depth descriptor at every voxel.
+- **3D residual U-Net with per-height spatial Transformer.** 3D convolutions couple the receiver-height layers, horizontal-only downsampling preserves the height dimension, and a Transformer at the bottleneck (2 blocks, 4 heads, dimension 128) models long-range dependencies within each height.
+- **Two-stage prediction.**
+  - Stage I: a deterministic coarse predictor regresses the four-height path-loss volume.
+  - Stage II: the coarse predictor is frozen, and a conditional diffusion corrector generates the scaled residual (cosine schedule, $T=200$, $v$-prediction, residual scale 0.5, terminal-timestep oversampling, geometric projection).
+- **Inference.** The residual is sampled from Gaussian noise with deterministic DDIM and added to the coarse prediction.
 
-## Repository Layout
+## Repository layout
 
 ```text
-configs/       random and uniform experiment configurations
-datasets/      NPZ loading and sparse-measurement construction
-diffusion/     beta schedule, forward process, loss, and DDPM sampler
-models/        AFF, residual U-Net, Transformer, and embeddings
-scripts/       experiment check, training, and full-noise evaluation
-trainers/      shared training/evaluation helpers
-utils/         metrics, logging, I/O, seeds, and visualization
-baselines/     baseline implementations plus checkpoint-free run evidence
-RESULTS.md     reported comparison table and available-run provenance
+models/        AFF, 3D residual blocks, Transformer, coarse predictor and residual corrector
+datasets/      four-height NPZ manifest dataset
+diffusion/     noise schedules and forward process
+scripts/       training / calibration / evaluation engine
+configs/       base configuration
+tests/         unit tests for the model, runner and launcher
+tools/         CPU verification and source-manifest tools
+reference/     immutable provenance copies verified by the engine (not imported)
+run.py         entry point (check / preflight / train / calibrate / eval / all)
+analyze_diffusion_value.py, make_paper_figs.py, plot_diffusion_value.py
+               uncertainty analysis and figure scripts
 ```
-
-## Results
-
-Under the 10% random-measurement protocol, the reported headline result for
-3DAFF-RadioDiff is **0.0179 NMSE**, **0.0686 RMSE**, and **29.5560 dB PSNR**.
-The complete baseline table, protocol notes, and links to the run evidence
-included in this repository are in [RESULTS.md](RESULTS.md).
-
-## Data
-
-Each NPZ sample must contain:
-
-```text
-q, depth, los, psi, z, id
-```
-
-The default Windows paths are:
-
-```text
-D:\datas\processed_pl_aff_dataset\train
-D:\datas\processed_pl_aff_dataset\val
-D:\datas\processed_pl_aff_dataset\test
-```
-
-Change `train_dir`, `val_dir`, and `test_dir` in both YAML files when using a
-different location.
 
 ## Environment
 
-```powershell
-conda activate rmdm5070
-pip install -r requirements.txt
-cd "C:\Users\Administrator\Desktop\3DAFF-RadioDiff-PathLoss"
-```
+- Python >= 3.8, PyTorch >= 1.12 with CUDA
+- Other dependencies: `pip install -r requirements.txt`
 
-The launchers first try `D:\Anaconda3\envs\rmdm5070\python.exe` and otherwise use
-the active environment's `python` command.
+The launcher in this release keeps the safeguards used for the paper experiments. Formal runs require:
+- an NVIDIA RTX 3090 that is idle and has at least 20 GB of free memory;
+- a conda environment named `radiodiffzcy`;
+- a successful full-size GPU preflight.
 
-## Random 10%
+## Data
 
-Check the complete pipeline before training:
-
-```powershell
-.\run_check.ps1 -Mode random -Gpu 0
-```
-
-Train a dedicated random-sampling checkpoint:
-
-```powershell
-.\run_train.ps1 -Mode random -Gpu 0
-```
-
-Evaluate 1,000 samples as a quick test, then all test samples:
-
-```powershell
-.\run_eval.ps1 -Mode random -Gpu 0 -MaxSamples 1000
-.\run_eval.ps1 -Mode random -Gpu 0
-```
-
-## Uniform 10%
-
-```powershell
-.\run_check.ps1 -Mode uniform -Gpu 0
-.\run_train.ps1 -Mode uniform -Gpu 0
-.\run_eval.ps1 -Mode uniform -Gpu 0 -MaxSamples 1000
-.\run_eval.ps1 -Mode uniform -Gpu 0
-```
-
-Random and uniform sampling use separate checkpoints and must be trained
-independently. Change `-Gpu` to the desired physical GPU index.
-
-## Outputs
-
-Random results are written under:
+The experiments use the four-height (1--4 m) subset of Urban3D-RadioMap with a scene-disjoint split of 108,200 / 12,000 / 10,000 training / validation / test samples. The dataset root is expected to contain:
 
 ```text
-outputs_pl_aff_random10_fullnoise/
+<dataset-root>/
+  metadata.json
+  train.csv  val.csv  test.csv
+  geometry/scene_####.npz
+  packed/{train,val,test}/scene_####/<sample_id>.npz
 ```
 
-Uniform results are written under:
+Each sample NPZ contains `target_u8`, `los_u8`, and `depth_f16`; each geometry NPZ contains the building heights. The dataset itself is not redistributed here. Please obtain it from the original release.
 
-```text
-outputs_pl_aff_uniform10_fullnoise_200/
+## Usage
+
+```bash
+conda activate radiodiffzcy
+# Read-only check of the code and data (CPU, no CUDA)
+python -B run.py --action check --dataset-root /path/to/dataset
+# Full-size GPU preflight (weights are discarded)
+python -B -u run.py --action preflight --dataset-root /path/to/dataset --gpu 0
+# Train Stage I (10 epochs) and Stage II (10 epochs), calibrate on validation, then evaluate
+python -B -u run.py --action all --dataset-root /path/to/dataset --gpu 0
 ```
 
-Each full evaluation writes `metrics_summary.csv`, `metrics_per_sample.csv`, and
-the first ten prediction archives. Use `-NoConsistency` only for an explicitly
-reported ablation; do not mix those results with the default protocol.
+Fixed training settings: AdamW (learning rate 1e-4, weight decay 1e-4), batch size 2, EMA 0.999, seed 42, automatic mixed precision. All metrics (RMSE, NMSE, PSNR with data range 2, and SSIM) are computed on the normalized path loss in $[-1,1]$, only at valid receiver locations.
 
-## Reproducibility Notes
+Uncertainty analysis (K samples per input) and paper figures:
 
-- The evaluation seed defaults to 42 and can be changed with `-Seed`.
-- Test sampling is deterministic for both protocols.
-- Random training masks are resampled, while uniform grid positions are fixed.
-- The reported random and uniform results should use the same test set, metric
-  implementation, diffusion schedule, and measurement-consistency policy.
+```bash
+python analyze_diffusion_value.py --split test --samples 200 --K 8 --steps 200 --output outputs_diffusion_value
+python make_paper_figs.py --input outputs_diffusion_value
+```
+
+## Citation
+
+If you find this code useful, please cite our paper (citation will be added upon publication).

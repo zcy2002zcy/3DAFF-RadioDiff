@@ -1,5 +1,6 @@
-numpy
-pandas
-PyYAML
-torch
-tqdm
+# Does not install/replace PyTorch or CUDA. Keep the radiodiffzcy GPU build.
+# Python 3.8 compatible ranges; exact runtime is recorded in protocol.json.
+numpy>=1.21,<1.25
+scipy>=1.7,<1.11
+Pillow>=8,<11
+PyYAML>=5.4,<7

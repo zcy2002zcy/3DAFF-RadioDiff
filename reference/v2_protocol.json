@@ -1,0 +1,106 @@
+{
+  "version": "q_building_prediction_10plus10_geometry_highnoise_v2",
+  "smoke_only": false,
+  "audit": {
+    "train": {
+      "samples": 108200,
+      "scenes": 541,
+      "sha256": "cdb80761469b8b01f108180ac7ee1fbac68604ed74a8680bed7b861ce022daa5"
+    },
+    "val": {
+      "samples": 12000,
+      "scenes": 60,
+      "sha256": "bc2fd13771dc6326be2f0ccdd75fb042dfc443c16a2a968234c2a0f868c95fdb"
+    },
+    "test": {
+      "samples": 10000,
+      "scenes": 50,
+      "sha256": "8c609e96dea97db46ba83d6cb4944b1b86fb13f74aeb371068d24678b291ef6e"
+    },
+    "metadata_sha256": "bb508e7421c5ac37be10b656ea3212ece17053413b0cde1b945aaf5254472de8",
+    "status": "scene_disjoint"
+  },
+  "source_sha256": {
+    "runner": "94a748c7593c0d2bfeb8adb5edd8a2dcd85d3de5ac3929f7e274c13b192fb0fb",
+    "revised_math": "823faeda2340f7abbd757f8cd23c9964e307c001f768dc40624841d38db14d2b",
+    "legacy_runner_metric_dataset_helpers": "fb33a2b66f5fe7dbb37abb51246f4da62b58f7c9f3a739b7f9c7b3282caca7b8",
+    "legacy_predictor_corrector": "113b2e4b0b6e653a17fa34513ffe563210334d596073539bb37e62a294741316",
+    "aff_architecture": "c65e2b4edf82605f25b96bb041db38de9741a39729a83cdc0bbdd37c1c456fe0",
+    "dataset": "fed9f6b6bd451f0b873fc235162b076032c9aec1c2faca83e6756c8098f50685",
+    "legacy_ssim_and_scene_selection": "ef0e8fc8a713271f28ac3cad3786c7d65b634e1aa4ac1b643222c1526c887c97"
+  },
+  "seed": 42,
+  "base_channels": 32,
+  "batch_size": 2,
+  "workers": 4,
+  "lr": 0.0001,
+  "weight_decay": 0.0001,
+  "coarse_epochs": 10,
+  "diffusion_epochs": 10,
+  "coarse_objective": "unchanged valid normalized map MSE",
+  "architecture": "unchanged Predictor and Corrector from pl3d_residual_prediction",
+  "ema_decay": 0.999,
+  "scale": 0.5,
+  "diffusion_steps": 200,
+  "schedule": "cosine",
+  "prediction_type": "v",
+  "residual_clipping": false,
+  "training_timestep_distribution": "0.75 uniform over [0,199] + 0.25 exact terminal 199",
+  "diffusion_loss": {
+    "valid_v_mse": 1.0,
+    "valid_map_l1": 0.5,
+    "valid_gradient_l1": 0.05,
+    "invalid_v_mse_zero_clean_residual": 0.1,
+    "high_noise_clean_residual_mse": 1.0,
+    "high_noise_alpha_bar_threshold": 0.2
+  },
+  "coarse_forward_for_diffusion": "frozen EMA coarse best, FP32, outside autocast",
+  "training_precision": "float16_amp_with_scaler",
+  "condition_profile": "aff_prediction",
+  "sample_rate": 0,
+  "include_idw_prior": false,
+  "train_samples": 0,
+  "val_samples": 32,
+  "checkpoint_selection": {
+    "split": "val",
+    "samples": 32,
+    "objective": "macro per sample-height MSE",
+    "diffusion_steps": 30,
+    "strength": 1.0,
+    "geometry_projection": true,
+    "noise_seed": "seed+100000+validation_iteration_index"
+  },
+  "inference_calibration": {
+    "split": "val",
+    "samples": 32,
+    "steps": [
+      1,
+      30
+    ],
+    "strengths": [
+      0.0,
+      0.1,
+      0.25,
+      0.5,
+      0.75,
+      1.0
+    ],
+    "repeats": 3,
+    "geometry_projection": true,
+    "objective": "macro sample-height-repeat MSE",
+    "noise_seed": "seed+2000000+repeat*100000+manifest_index",
+    "tie_break": "lowest steps, then lowest strength",
+    "ensemble": false
+  },
+  "test": {
+    "samples": 200,
+    "repeats": 3,
+    "noise_seed": "seed+1000000+repeat*100000+manifest_index",
+    "metrics": "valid_four_legacy_normalized_minus1_plus1",
+    "psnr_data_range": 2.0,
+    "aggregation": "macro sample-height, metrics averaged over repeats",
+    "ensemble": false
+  },
+  "budget_disclosure": "10 coarse + 10 diffusion epochs = 20 epoch-passes; not equal compute to 10-epoch baselines",
+  "no_guaranteed_improvement": true
+}
