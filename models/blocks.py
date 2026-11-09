@@ -1,4 +1,5 @@
-from typing import Optional, Tuple
+from __future__ import annotations
+from typing import Optional
 
 import torch
 import torch.nn as nn
@@ -217,7 +218,7 @@ class UpBlock(nn.Module):
         )
 
     @staticmethod
-    def _match_size(x: torch.Tensor, skip: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+    def _match_size(x: torch.Tensor, skip: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
         """
         当上采样后尺寸与 skip 不完全一致时，做对齐。
         """

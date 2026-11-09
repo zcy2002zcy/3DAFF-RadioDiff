@@ -1,45 +1,23 @@
 # Python
 __pycache__/
 *.py[cod]
-.pytest_cache/
-.mypy_cache/
+.ipynb_checkpoints/
 
-# Environments and IDEs
-.venv/
-venv/
+# IDE / OS
 .idea/
 .vscode/
-
-# Experiment artifacts
-outputs*/
-checkpoints/
-logs/
-tensorboard/
-*.pt
-*.pth
-*.ckpt
-*.onnx
-metrics_per_sample.csv
-metrics_summary.csv
-
-# Keep the lightweight, checkpoint-free baseline evidence bundled for audit.
-# The generic experiment rules above still apply to the main 3DAFF runs.
-!baselines/**/outputs*/
-!baselines/**/outputs*/**
-!baselines/logs/
-!baselines/logs/**
-!baselines/**/logs/
-!baselines/**/logs/**
-
-# Local data and caches
-data/
-datasets_cache/
-cache/
-*.npz
-
-# OS files
 .DS_Store
 Thumbs.db
 
-# Prediction archives are retained only inside the audited baseline evidence.
-!baselines/**/outputs*/**/*.npz
+# Data, weights and generated outputs are never committed
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.npz
+*.npy
+outputs_*/
+server_run/
+paper_figures/
+*.log
+*.lock

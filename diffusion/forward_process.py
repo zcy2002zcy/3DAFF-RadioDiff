@@ -1,4 +1,6 @@
-from typing import Dict, Optional, Tuple, Union
+from __future__ import annotations
+
+from typing import Optional, Tuple,Dict
 
 import torch
 
@@ -22,7 +24,7 @@ class DiffusionForwardProcess:
     def __init__(
         self,
         betas: torch.Tensor,
-        device: Union[torch.device, str] = "cpu",
+        device: torch.device | str = "cpu",
     ) -> None:
         """
         Args:
@@ -91,7 +93,7 @@ class DiffusionForwardProcess:
             / torch.clamp(1.0 - self.alphas_cumprod, min=1e-20)
         )
 
-    def to(self, device: Union[torch.device, str]) -> "DiffusionForwardProcess":
+    def to(self, device: torch.device | str) -> "DiffusionForwardProcess":
         """
         将内部缓存张量搬到新设备
         """
@@ -212,6 +214,34 @@ class DiffusionForwardProcess:
             sqrt_one_minus_alpha_bar_t, min=1e-20
         )
         return noise
+
+    def make_v_target(
+        self, x0: torch.Tensor, noise: torch.Tensor, t: torch.Tensor
+    ) -> torch.Tensor:
+        """Velocity target from Progressive Distillation / v-parameterization."""
+        sqrt_alpha_bar_t = self._extract(self.sqrt_alphas_cumprod, t, x0.shape)
+        sqrt_one_minus_alpha_bar_t = self._extract(
+            self.sqrt_one_minus_alphas_cumprod, t, x0.shape
+        )
+        return sqrt_alpha_bar_t * noise - sqrt_one_minus_alpha_bar_t * x0
+
+    def predict_x0_from_v(
+        self, xt: torch.Tensor, t: torch.Tensor, velocity: torch.Tensor
+    ) -> torch.Tensor:
+        sqrt_alpha_bar_t = self._extract(self.sqrt_alphas_cumprod, t, xt.shape)
+        sqrt_one_minus_alpha_bar_t = self._extract(
+            self.sqrt_one_minus_alphas_cumprod, t, xt.shape
+        )
+        return sqrt_alpha_bar_t * xt - sqrt_one_minus_alpha_bar_t * velocity
+
+    def predict_noise_from_v(
+        self, xt: torch.Tensor, t: torch.Tensor, velocity: torch.Tensor
+    ) -> torch.Tensor:
+        sqrt_alpha_bar_t = self._extract(self.sqrt_alphas_cumprod, t, xt.shape)
+        sqrt_one_minus_alpha_bar_t = self._extract(
+            self.sqrt_one_minus_alphas_cumprod, t, xt.shape
+        )
+        return sqrt_one_minus_alpha_bar_t * xt + sqrt_alpha_bar_t * velocity
 
     def q_posterior(
         self,
