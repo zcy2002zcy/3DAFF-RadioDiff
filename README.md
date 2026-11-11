@@ -37,7 +37,7 @@ analyze_diffusion_value.py, make_paper_figs.py, plot_diffusion_value.py
 - Other dependencies: `pip install -r requirements.txt`
 
 The launcher in this release keeps the safeguards used for the paper experiments. Formal runs require:
-- an NVIDIA RTX 3090 that is idle and has at least 20 GB of free memory;
+- an NVIDIA RTX 3090 that is idle and has at least 24 GB of free memory;
 - a conda environment named `radiodiffzcy`;
 - a successful full-size GPU preflight.
 
